@@ -57,3 +57,5 @@ typings/
 # dotenv environment variables file
 .env
 
+#Generated Files
+public/js/app.js
