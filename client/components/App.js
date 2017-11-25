@@ -1,7 +1,13 @@
 import React from 'react';
 import _ from 'underscore';
+import {Link} from 'react-router-dom';
 
 import SecuritiesStore from '../stores/SecuritiesStore';
+
+const currencyOptions = {
+    style: 'currency',
+    currency: 'USD'
+};
 
 export default class App extends React.Component {
     constructor(props){
@@ -14,12 +20,14 @@ export default class App extends React.Component {
 
         let tableBody = _.map( this.state, security => (
             <tr>
-                <td>{security.tickerId}</td>
-                <td>{security.seriesTotals.open}</td>
-                <td>{security.seriesTotals.close}</td>
-                <td>{security.seriesTotals.high}</td>
-                <td>{security.seriesTotals.low}</td>
-                <td>{security.seriesTotals.volume}</td>
+                <td>
+                    <Link to={`/security/${security.tickerId}`}>{security.tickerId}</Link>
+                </td>
+                <td>{security.seriesTotals.open.toLocaleString('en-us', currencyOptions)}</td>
+                <td>{security.seriesTotals.close.toLocaleString('en-us', currencyOptions)}</td>
+                <td>{security.seriesTotals.high.toLocaleString('en-us', currencyOptions)}</td>
+                <td>{security.seriesTotals.low.toLocaleString('en-us', currencyOptions)}</td>
+                <td>{security.seriesTotals.volume.toLocaleString('en-us')}</td>
             </tr>
         ));
 

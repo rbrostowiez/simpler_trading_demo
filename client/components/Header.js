@@ -1,13 +1,14 @@
 import React from 'react';
+import {Link} from 'react-router-dom';
 
 export default class Header extends React.Component{
     
     render(){
         return (
             <header className="navbar navbar-dark bg-dark">
-                <a href="/" className="navbar-brand">
+                <Link to="/" className="navbar-brand">
                     Simpler Trading Demo App
-                </a>
+                </Link>
             </header>
         )
     }

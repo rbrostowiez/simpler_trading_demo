@@ -9,9 +9,8 @@ export default (
     <BrowserRouter>
         <div>
             <Header />
-            <Route path="/" component={App} />
+            <Route exact path="/" component={App} />
             <Route path="/security/:tickerId" component={SecurityDetails} />
         </div>
-
     </BrowserRouter>
-);
+); 
