@@ -1,0 +1,3 @@
+export default {
+    SET_CURRENT_SECURITY: 'SET_CURRENT_SECURITY'
+};

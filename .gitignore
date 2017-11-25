@@ -58,4 +58,4 @@ typings/
 .env
 
 #Generated Files
-public/js/app.js
+public/js/App.js
