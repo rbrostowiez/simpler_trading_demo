@@ -27,12 +27,8 @@ export default class SecurityDetails extends React.Component{
         let {tickerId, seriesTotals, startInterval, endInterval, lastRefreshed, seriesData} = this.state;
 
         return (
+            //TODO: More components and less giant blocks of HTML!
             <div className="security-details container-fluid">
-                <div className="row">
-                    <div className="col">
-                        <h2></h2>
-                    </div>
-                </div>
                 <div className="row">
                     <div className="col">
                         <div className="card bg-light mb-3">

@@ -1,3 +1,4 @@
+//TODO: Organize constants better
 export default {
     SET_CURRENT_SECURITY: 'SET_CURRENT_SECURITY',
     DATE_FORMAT: 'YYYY-MM-DD',
