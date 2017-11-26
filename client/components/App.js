@@ -3,11 +3,7 @@ import _ from 'underscore';
 import {Link} from 'react-router-dom';
 
 import SecuritiesStore from '../stores/SecuritiesStore';
-
-const currencyOptions = {
-    style: 'currency',
-    currency: 'USD'
-};
+import AppConstants from '../constants/AppConstants';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -26,10 +22,10 @@ export default class App extends React.Component {
                 <td>
                     From: {security.startInterval} through {security.endInterval}, last refreshed: {security.lastRefreshed}
                 </td>
-                <td>{security.seriesTotals.open.toLocaleString('en-us', currencyOptions)}</td>
-                <td>{security.seriesTotals.close.toLocaleString('en-us', currencyOptions)}</td>
-                <td>{security.seriesTotals.high.toLocaleString('en-us', currencyOptions)}</td>
-                <td>{security.seriesTotals.low.toLocaleString('en-us', currencyOptions)}</td>
+                <td>{security.seriesTotals.open.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
+                <td>{security.seriesTotals.close.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
+                <td>{security.seriesTotals.high.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
+                <td>{security.seriesTotals.low.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
                 <td>{security.seriesTotals.volume.toLocaleString('en-us')}</td>
             </tr>
         ));

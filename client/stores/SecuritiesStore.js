@@ -81,7 +81,7 @@ class SecuritiesStore extends EventEmitter {
 
         let startInterval = seriesIntervals[0];
         let endInterval = seriesIntervals[numIntervals - 1];
-
+        //Reduce to get totals, and has side efect of re-mapping source object to simpler keys
         let seriesTotals = _.reduce(seriesIntervals,
             (totals, interval, intervalIndex, intervalList) => {
                 let {
@@ -97,6 +97,14 @@ class SecuritiesStore extends EventEmitter {
                 low = parseFloat(low);
                 close = parseFloat(close);
                 volume = parseInt(volume);
+
+                seriesData[interval] = {
+                    open,
+                    close,
+                    high,
+                    low,
+                    volume
+                };
 
                 if(intervalIndex == 0 ){
                     totals.open = open;
