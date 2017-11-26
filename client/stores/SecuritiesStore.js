@@ -29,6 +29,8 @@ class SecuritiesStore extends EventEmitter {
 
                 default: return true;
             }
+
+            this.emit('change');
         });
     }
 
