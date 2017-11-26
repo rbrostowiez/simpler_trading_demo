@@ -10,18 +10,21 @@ const currencyOptions = {
 };
 
 export default class App extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
 
-        this.state = SecuritiesStore.getSecuritySummary();
+        this.state = SecuritiesStore.getSecuritiesSummary();
     }
 
-    render(){
+    render() {
 
-        let tableBody = _.map( this.state, security => (
-            <tr>
+        let tableBody = _.map(this.state.securityDetails, security => (
+            <tr key={security.tickerId}>
                 <td>
                     <Link to={`/security/${security.tickerId}`}>{security.tickerId}</Link>
+                </td>
+                <td>
+                    From: {security.startInterval} through {security.endInterval}, last refreshed: {security.lastRefreshed}
                 </td>
                 <td>{security.seriesTotals.open.toLocaleString('en-us', currencyOptions)}</td>
                 <td>{security.seriesTotals.close.toLocaleString('en-us', currencyOptions)}</td>
@@ -34,26 +37,77 @@ export default class App extends React.Component {
         return (
             <div className="container-fluid">
                 <div className="row">
-                    <div className="col-12">
-                        <h1>Welcome!</h1>
+                    <div className="col">
+                        <p className="alert alert-warning">
+                            <strong>NOTE: </strong>
+                            Most of the filter controls are disabled because there is not enough data to support their
+                            functionality.
+                        </p>
                     </div>
                 </div>
                 <div className="row">
-                    <div className="col-12">
-                        <p>This is a demo app, below you can see the information on current financial securities.</p>
+                    <div className="col-12 col-md-6">
+                        <form>
+                            <div className="form-row">
+                                <div className="col form-group">
+                                    <input disabled type="text" className="form-control" name="ticker-search" placeholder="Ticker Search"/>
+                                </div>
+                            </div>
+                            <div className="form-row">
+                                <div className="col form-group">
+                                    <label htmlFor="interval-range-start">Start: </label>
+                                    <select className="form-control" name="interval-range-start"
+                                            id="interval-range-start" disabled>
+                                        <option value={this.state.dataRangeMinDate}>
+                                            {this.state.dataRangeMinDate}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div className="col form-group">
+                                    <label htmlFor="interval-range-end"> End:</label>
+                                    <select className="form-control" name="interval-range-end" id="interval-range-end"
+                                            disabled>
+                                        <option value={this.state.dataRangeMaxDate}>
+                                            {this.state.dataRangeMaxDate}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div className="col form-group">
+                                    <label htmlFor="interval-size">Interval Size:</label>
+                                    <select className="form-control" name="interval-size" id="interval-size" disabled>
+                                        <option value="week">Week</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div className="col-12 col-md-6">
+                        <div className="row">
+                            <div className="col">
+                                <strong>Securities Found: </strong>
+                                <span>{Object.keys(this.state.securityDetails).length}</span>
+                            </div>
+                            <div className="col">
+                                <strong>Total Volume: </strong>
+                                <span>{this.state.totalVolume.toLocaleString('en-us')}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
                 <div className="row">
                     <table className="table">
                         <thead>
-                            <tr>
-                                <th>Ticker Symbol</th>
-                                <th>Open</th>
-                                <th>Close</th>
-                                <th>High</th>
-                                <th>Low</th>
-                                <th>Volume</th>
-                            </tr>
+                        <tr>
+                            <th>Ticker Symbol</th>
+                            <th>Data Coverage</th>
+                            <th>Open</th>
+                            <th>Close</th>
+                            <th>High</th>
+                            <th>Low</th>
+                            <th>Volume</th>
+                        </tr>
                         </thead>
                         <tbody>
                         {tableBody}
