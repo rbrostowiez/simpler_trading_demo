@@ -5,6 +5,8 @@ import moment from 'moment';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import AppConstants from '../constants/AppConstants';
 import Data from '../../server/data';
+import RequestStore from './RequestStore';
+
 
 class SecuritiesStore extends EventEmitter {
     constructor(){
