@@ -75,7 +75,7 @@ function generateRandomCompanyData(){
 
 function generateYearOfData(){
     const volatility = Math.random() * 0.2 + 0.05; //Range: [5 - 24.999%]
-    const volumeFactor = Math.min(Math.floor(Math.random() * 10000000), 50000);//Range: [50,000:999,999] with high chances on 50,000
+    const volumeFactor = Math.min(Math.floor(Math.random() * 100000000), 500000);//Range: [500,000:9,999,999] with high chances on 500,000
     const dividendWeek = Math.floor(Math.random() * 52);//Pick a random week and pay against current score
     const startPrice = Math.floor(Math.random() * 1000);
 
@@ -136,6 +136,14 @@ class SecurityModel {
 
 
         return normalize(security);
+    }
+
+    lookupSymbol(partial) {
+        let symbols = _.map(_.filter(data, item => item['Meta Data']['2. Symbol'].indexOf(partial.toUpperCase()) === 0 ),
+            item => item['Meta Data']['2. Symbol'].toUpperCase());
+
+
+        return symbols;
     }
 
     getAllData() {

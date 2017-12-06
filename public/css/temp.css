@@ -1,0 +1,10 @@
+.security-search-form {
+
+}
+
+.security-search-form .suggestion-list {
+    position: absolute;
+    z-index: 10;
+
+    top: 100%;
+}

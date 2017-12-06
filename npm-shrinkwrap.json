@@ -1752,6 +1752,16 @@
       "from": "react@https://registry.npmjs.org/react/-/react-16.1.1.tgz",
       "resolved": "https://registry.npmjs.org/react/-/react-16.1.1.tgz"
     },
+    "react-autosuggest": {
+      "version": "9.3.2",
+      "from": "react-autosuggest@latest",
+      "resolved": "https://registry.npmjs.org/react-autosuggest/-/react-autosuggest-9.3.2.tgz"
+    },
+    "react-autowhatever": {
+      "version": "10.1.0",
+      "from": "react-autowhatever@>=10.1.0 <11.0.0",
+      "resolved": "https://registry.npmjs.org/react-autowhatever/-/react-autowhatever-10.1.0.tgz"
+    },
     "react-dom": {
       "version": "16.1.1",
       "from": "react-dom@https://registry.npmjs.org/react-dom/-/react-dom-16.1.1.tgz",
@@ -1778,6 +1788,18 @@
       "version": "4.2.2",
       "from": "react-router-dom@https://registry.npmjs.org/react-router-dom/-/react-router-dom-4.2.2.tgz",
       "resolved": "https://registry.npmjs.org/react-router-dom/-/react-router-dom-4.2.2.tgz"
+    },
+    "react-themeable": {
+      "version": "1.1.0",
+      "from": "react-themeable@>=1.1.0 <2.0.0",
+      "resolved": "https://registry.npmjs.org/react-themeable/-/react-themeable-1.1.0.tgz",
+      "dependencies": {
+        "object-assign": {
+          "version": "3.0.0",
+          "from": "object-assign@>=3.0.0 <4.0.0",
+          "resolved": "https://registry.npmjs.org/object-assign/-/object-assign-3.0.0.tgz"
+        }
+      }
     },
     "read-pkg": {
       "version": "2.0.0",
@@ -1884,6 +1906,11 @@
       "from": "safe-buffer@https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.1.tgz",
       "resolved": "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.1.tgz"
     },
+    "section-iterator": {
+      "version": "2.0.0",
+      "from": "section-iterator@>=2.0.0 <3.0.0",
+      "resolved": "https://registry.npmjs.org/section-iterator/-/section-iterator-2.0.0.tgz"
+    },
     "semver": {
       "version": "5.4.1",
       "from": "semver@https://registry.npmjs.org/semver/-/semver-5.4.1.tgz",
@@ -1923,6 +1950,11 @@
       "version": "2.4.9",
       "from": "sha.js@https://registry.npmjs.org/sha.js/-/sha.js-2.4.9.tgz",
       "resolved": "https://registry.npmjs.org/sha.js/-/sha.js-2.4.9.tgz"
+    },
+    "shallow-equal": {
+      "version": "1.0.0",
+      "from": "shallow-equal@>=1.0.0 <2.0.0",
+      "resolved": "https://registry.npmjs.org/shallow-equal/-/shallow-equal-1.0.0.tgz"
     },
     "shebang-command": {
       "version": "1.2.0",
@@ -2145,7 +2177,7 @@
     },
     "uuid": {
       "version": "3.1.0",
-      "from": "uuid@latest",
+      "from": "https://registry.npmjs.org/uuid/-/uuid-3.1.0.tgz",
       "resolved": "https://registry.npmjs.org/uuid/-/uuid-3.1.0.tgz"
     },
     "validate-npm-package-license": {

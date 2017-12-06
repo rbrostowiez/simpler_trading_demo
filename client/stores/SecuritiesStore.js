@@ -11,6 +11,7 @@ class SecuritiesStore extends EventEmitter {
     constructor(){
         super();
 
+        this.filter = {tokens: ['MSFT', 'GOOG']};
         this.currentSecurityId = null;
         this.securitiesDetailCache = {};
         this.dataRangeMinDate = moment().format(AppConstants.DATE_FORMAT);
@@ -18,7 +19,9 @@ class SecuritiesStore extends EventEmitter {
         this.totalVolume = 0;
         this.currentRequestId = null;
         this.rawData = null;
-
+        this.partial = '';
+        this.suggestions = [];
+        this.processingPartial = false;
 
         this.currentRequestId = SecuritiesActions.loadData();
 
@@ -29,8 +32,14 @@ class SecuritiesStore extends EventEmitter {
                 case AppConstants.SET_CURRENT_SECURITY:
                     this.setCurrentSecurity(action.tickerId);
                     break;
+                case AppConstants.PERFORM_REQUEST:
+                    this.handleRequestPerformed(action);
+                    break;
                 case AppConstants.REQUEST_COMPLETED:
                     this.handleRequestCompleted(action.requestId);
+                    break;
+                case AppConstants.UPDATE_SECURITY_SEARCH_FILTER:
+                    this.updateFilter(action.fieldName, action.fieldValue);
                     break;
                 default: return true;
             }
@@ -45,7 +54,7 @@ class SecuritiesStore extends EventEmitter {
 
     getCurrentSecurityDetails(){
         if(!this.securitiesDetailCache.hasOwnProperty(this.currentSecurityId)){
-            SecuritiesActions.loadSecurity();
+            this.currentRequestId = SecuritiesActions.loadSecurity();
         }
         return this.securitiesDetailCache[this.currentSecurityId];
     }
@@ -56,7 +65,11 @@ class SecuritiesStore extends EventEmitter {
             dataRangeMinDate: this.dataRangeMinDate,
             numIntervals: this.numIntervals,
             securityDetails: this.securitiesDetailCache,
-            totalVolume: this.totalVolume
+            totalVolume: this.totalVolume,
+            partial: this.partial,
+            suggestions: this.suggestions,
+            processingPartial: this.processingPartial,
+            filter: this.filter
         };
     }
 
@@ -155,8 +168,8 @@ class SecuritiesStore extends EventEmitter {
             return;
         }
 
-
         let result = RequestStore.getRequestResults(this.currentRequestId);
+
         if(result.url.indexOf(`${AppConstants.API_SECURITY}/data`) !== -1){
             this.rawData = result.body;
 
@@ -165,8 +178,38 @@ class SecuritiesStore extends EventEmitter {
         else if(result.url.indexOf(`${AppConstants.API_SECURITY}/details`) !== -1){
             this.securitiesDetailCache[result.body.symbol] = result.body;
         }
+        else if(result.url.indexOf(`${AppConstants.API_SECURITY}/lookup`) !== -1){
+            this.suggestions = result.body;
+            this.processingPartial = false;
+        }
 
         this.currentRequestId = null;
+    }
+
+    updateFilter(fieldName, fieldValue) {
+        if(this.filter.hasOwnProperty(fieldName)){
+            this.filter[fieldName] = fieldValue;
+        }
+        else if(fieldName === 'addToken'){
+            this.partial = '';
+            this.suggestions = [];
+            this.filter.tokens.push(fieldValue);
+            this.filter.tokens = _.uniq(this.filter.tokens);
+
+        }
+        else if(fieldName === 'removeToken'){
+            this.filter.tokens = _.without(this.filter.tokens, fieldValue);
+        }
+    }
+
+
+    handleRequestPerformed(action) {
+        //TODO: currentRequestId for all requests should probably come in this fashion
+        if(action.url.indexOf(`${AppConstants.API_SECURITY}/lookup`) !== -1){
+            this.partial = action.partial;
+            this.currentRequestId = action.requestId;
+            this.processingPartial = true;
+        }
     }
 }
 

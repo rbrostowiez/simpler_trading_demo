@@ -35,10 +35,11 @@
     "moment": "^2.19.2",
     "node-fetch": "https://registry.npmjs.org/node-fetch/-/node-fetch-1.7.3.tgz",
     "react": "^16.1.1",
+    "react-autosuggest": "^9.3.2",
     "react-dom": "^16.1.1",
     "react-router-dom": "^4.2.2",
     "underscore": "^1.8.3",
-    "uuid": "^3.1.0",
+    "uuid": "https://registry.npmjs.org/uuid/-/uuid-3.1.0.tgz",
     "webpack": "^3.8.1"
   },
   "devDependencies": {

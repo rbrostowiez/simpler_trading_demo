@@ -16,7 +16,7 @@ securityRouter.get('/details/:symbol', (req, res)=> {
 });
 
 securityRouter.get('/lookup/:partial', (req, res) => {
-    res.send(SecurityModel.lookup(req.params.partial));
+    res.send(SecurityModel.lookupSymbol(req.params.partial));
 });
 
 export default securityRouter;

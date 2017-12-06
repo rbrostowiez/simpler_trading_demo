@@ -10,5 +10,6 @@ export default {
     PERFORM_REQUEST: 'PERFORM_REQUEST',
     REQUEST_COMPLETED: 'REQUEST_COMPLETED',
     API_SECURITY: '/api/security',
-    SITE_URL: 'http://localhost:3000'
+    SITE_URL: 'http://localhost:3000',
+    UPDATE_SECURITY_SEARCH_FILTER: 'UPDATE_SECURITY_SEARCH_FILTER'
 };

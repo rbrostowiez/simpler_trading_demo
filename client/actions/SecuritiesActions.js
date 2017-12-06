@@ -35,8 +35,17 @@ export default class SecuritiesActions {
         AppDispatcher.handleAction({
             actionType: AppConstants.PERFORM_REQUEST,
             url: `${AppConstants.API_SECURITY}/lookup/${partial}`,
+            partial: partial,
             requestId: reqId
         });
         return reqId;
+    }
+
+    static updateSecuritySearchFilter(fieldName, fieldValue){
+        AppDispatcher.handleAction({
+            actionType: AppConstants.UPDATE_SECURITY_SEARCH_FILTER,
+            fieldName: fieldName,
+            fieldValue: fieldValue
+        });
     }
 }
