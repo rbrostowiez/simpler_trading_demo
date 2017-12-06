@@ -1,5 +1,5 @@
 import express from 'express';
-import SecurityModel from '../../models/SecurityModel';
+import SecurityModel from '../../../shared/models/SecurityModel';
 
 const securityRouter = new express.Router();
 

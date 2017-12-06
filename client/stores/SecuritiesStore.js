@@ -6,12 +6,13 @@ import AppDispatcher from '../dispatcher/AppDispatcher';
 import SecuritiesActions from '../actions/SecuritiesActions';
 import AppConstants from '../constants/AppConstants';
 import RequestStore from './RequestStore';
+import SecuritySearchFilter from "../../shared/models/SecuritySearchFilter";
 
 class SecuritiesStore extends EventEmitter {
     constructor(){
         super();
 
-        this.filter = {tokens: ['MSFT', 'GOOG']};
+        this.filter = new SecuritySearchFilter();
         this.currentSecurityId = null;
         this.securitiesDetailCache = {};
         this.dataRangeMinDate = moment().format(AppConstants.DATE_FORMAT);
@@ -119,13 +120,7 @@ class SecuritiesStore extends EventEmitter {
                 close = parseFloat(close);
                 volume = parseInt(volume);
 
-                seriesData[interval] = {
-                    open,
-                    close,
-                    high,
-                    low,
-                    volume
-                };
+                seriesData[interval] = { open, close, high, low, volume };
 
                 if(intervalIndex == 0 ){
                     totals.open = open;
@@ -193,12 +188,12 @@ class SecuritiesStore extends EventEmitter {
         else if(fieldName === 'addToken'){
             this.partial = '';
             this.suggestions = [];
-            this.filter.tokens.push(fieldValue);
-            this.filter.tokens = _.uniq(this.filter.tokens);
+            this.filter.symbols.push(fieldValue);
+            this.filter.symbols = _.uniq(this.filter.symbols);
 
         }
         else if(fieldName === 'removeToken'){
-            this.filter.tokens = _.without(this.filter.tokens, fieldValue);
+            this.filter.symbols = _.without(this.filter.symbols, fieldValue);
         }
     }
 

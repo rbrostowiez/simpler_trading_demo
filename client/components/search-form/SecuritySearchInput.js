@@ -23,10 +23,10 @@ export default class SecuritySearchInput extends React.Component {
 
     render() {
         let tokenList = null;
-        if(this.state.filter.tokens.length){
+        if(this.state.filter.symbols.length){
             tokenList = (
                 <span className="input-group-addon">
-                    {_.map(this.state.filter.tokens, item => (
+                    {_.map(this.state.filter.symbols, item => (
                         <a onClick={this.removeSymbolFromSearch} key={`security-${item}`} href={`#${item}`} className="badge badge-pill badge-primary">
                             {item}
                         </a>
