@@ -1,12 +1,6 @@
 module.exports = {
     node: {
-        fs: 'empty',
-        lookup: 'empty',
-        dgram: 'empty',
-        server: true,
-        utils: true,
-        net: 'empty',
-        dns: 'empty'
+       
     },
     entry: './client/index.js',
     output: {

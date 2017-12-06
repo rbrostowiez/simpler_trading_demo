@@ -11,6 +11,10 @@ export default class App extends React.Component {
         super(props);
 
         this.state = SecuritiesStore.getSecuritiesSummary();
+
+        SecuritiesStore.on('change', (e) =>{
+            this.setState(SecuritiesStore.getSecuritiesSummary());
+        })
     }
 
     render() {

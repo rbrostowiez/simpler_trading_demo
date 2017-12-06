@@ -6,5 +6,9 @@ export default {
     CURRENCY_OPTIONS: {
         style: 'currency',
         currency: 'USD'
-    }
+    },
+    PERFORM_REQUEST: 'PERFORM_REQUEST',
+    REQUEST_COMPLETED: 'REQUEST_COMPLETED',
+    API_SECURITY: '/api/security',
+    SITE_URL: 'http://localhost:3000'
 };

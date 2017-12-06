@@ -3,10 +3,9 @@ import _ from 'underscore';
 import moment from 'moment';
 
 import AppDispatcher from '../dispatcher/AppDispatcher';
+import SecuritiesActions from '../actions/SecuritiesActions';
 import AppConstants from '../constants/AppConstants';
-import Data from '../../server/data';
 import RequestStore from './RequestStore';
-
 
 class SecuritiesStore extends EventEmitter {
     constructor(){
@@ -17,9 +16,11 @@ class SecuritiesStore extends EventEmitter {
         this.dataRangeMinDate = moment().format(AppConstants.DATE_FORMAT);
         this.dataRangeMaxDate = AppConstants.DATE_FORMAT_EPOCH;
         this.totalVolume = 0;
+        this.currentRequestId = null;
+        this.rawData = null;
 
-        _.each(Data, this.generateSecurityDetails, this);
 
+        this.currentRequestId = SecuritiesActions.loadData();
 
         AppDispatcher.register((payload) => {
             let {action} = payload;
@@ -28,7 +29,9 @@ class SecuritiesStore extends EventEmitter {
                 case AppConstants.SET_CURRENT_SECURITY:
                     this.setCurrentSecurity(action.tickerId);
                     break;
-
+                case AppConstants.REQUEST_COMPLETED:
+                    this.handleRequestCompleted(action.requestId);
+                    break;
                 default: return true;
             }
 
@@ -36,11 +39,14 @@ class SecuritiesStore extends EventEmitter {
         });
     }
 
-    setCurrentSecurity(tickerId){
-        this.currentSecurityId = tickerId;
+    setCurrentSecurity(symbol){
+        this.currentSecurityId = symbol;
     }
 
     getCurrentSecurityDetails(){
+        if(!this.securitiesDetailCache.hasOwnProperty(this.currentSecurityId)){
+            SecuritiesActions.loadSecurity();
+        }
         return this.securitiesDetailCache[this.currentSecurityId];
     }
 
@@ -55,7 +61,7 @@ class SecuritiesStore extends EventEmitter {
     }
 
     /**
-     * This is a function used to generate summary data and normalize the received Data object for use in Components.
+     * This is a function used to generate summary data and normalize the received data object for use in Components.
      *
      * NOTE: Most of what is done here should really be done server-side
      *
@@ -142,6 +148,25 @@ class SecuritiesStore extends EventEmitter {
             endInterval,
             lastRefreshed
         };
+    }
+
+    handleRequestCompleted(requestId) {
+        if(requestId !== this.currentRequestId){
+            return;
+        }
+
+
+        let result = RequestStore.getRequestResults(this.currentRequestId);
+        if(result.url.indexOf(`${AppConstants.API_SECURITY}/data`) !== -1){
+            this.rawData = result.body;
+
+            _.each(this.rawData, this.generateSecurityDetails, this);
+        }
+        else if(result.url.indexOf(`${AppConstants.API_SECURITY}/details`) !== -1){
+            this.securitiesDetailCache[result.body.symbol] = result.body;
+        }
+
+        this.currentRequestId = null;
     }
 }
 

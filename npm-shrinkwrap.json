@@ -578,11 +578,6 @@
       "from": "binary-extensions@https://registry.npmjs.org/binary-extensions/-/binary-extensions-1.11.0.tgz",
       "resolved": "https://registry.npmjs.org/binary-extensions/-/binary-extensions-1.11.0.tgz"
     },
-    "biskviit": {
-      "version": "1.0.1",
-      "from": "biskviit@1.0.1",
-      "resolved": "https://registry.npmjs.org/biskviit/-/biskviit-1.0.1.tgz"
-    },
     "bn.js": {
       "version": "4.11.8",
       "from": "bn.js@https://registry.npmjs.org/bn.js/-/bn.js-4.11.8.tgz",
@@ -1004,11 +999,6 @@
           "resolved": "https://registry.npmjs.org/core-js/-/core-js-1.2.7.tgz"
         }
       }
-    },
-    "fetch": {
-      "version": "1.1.0",
-      "from": "fetch@latest",
-      "resolved": "https://registry.npmjs.org/fetch/-/fetch-1.1.0.tgz"
     },
     "filename-regex": {
       "version": "2.0.1",
@@ -1488,7 +1478,7 @@
     },
     "node-fetch": {
       "version": "1.7.3",
-      "from": "node-fetch@https://registry.npmjs.org/node-fetch/-/node-fetch-1.7.3.tgz",
+      "from": "https://registry.npmjs.org/node-fetch/-/node-fetch-1.7.3.tgz",
       "resolved": "https://registry.npmjs.org/node-fetch/-/node-fetch-1.7.3.tgz"
     },
     "node-libs-browser": {
@@ -1687,11 +1677,6 @@
       "version": "1.0.2",
       "from": "pseudomap@https://registry.npmjs.org/pseudomap/-/pseudomap-1.0.2.tgz",
       "resolved": "https://registry.npmjs.org/pseudomap/-/pseudomap-1.0.2.tgz"
-    },
-    "psl": {
-      "version": "1.1.21",
-      "from": "psl@>=1.1.7 <2.0.0",
-      "resolved": "https://registry.npmjs.org/psl/-/psl-1.1.21.tgz"
     },
     "public-encrypt": {
       "version": "4.0.0",
@@ -2157,6 +2142,11 @@
       "version": "1.0.1",
       "from": "utils-merge@https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.1.tgz",
       "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.1.tgz"
+    },
+    "uuid": {
+      "version": "3.1.0",
+      "from": "uuid@latest",
+      "resolved": "https://registry.npmjs.org/uuid/-/uuid-3.1.0.tgz"
     },
     "validate-npm-package-license": {
       "version": "3.0.1",
