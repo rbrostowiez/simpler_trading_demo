@@ -2,6 +2,9 @@ import data from '../data';
 
 import _ from 'underscore';
 import moment from 'moment';
+import SecuritySearchSummary from "./SecuritySearchSummary";
+import SecuritySearchResults from "./SecuritySearchResults";
+import SecuritySearchItem from "./SecuritySearchItem";
 
 
 const ONE_YEAR_MS = 31536000000;
@@ -126,7 +129,6 @@ class SecurityModel {
     getSecurityByTickerSymbol(symbol) {
         let security = _.find(data, item => symbol.toUpperCase() === item['Meta Data']['2. Symbol']);
 
-
         return normalize(security);
     }
 
@@ -141,39 +143,79 @@ class SecurityModel {
     /**
      *
      * @param {SecuritySearchFilter} filter
+     * @return {SecuritySearchResults}
      */
-    getSecuritiesByFilter(filter) {
+    getSecuritySearchResultsByFilter(filter) {
         let securities = data;
         let {intervalStart: start, intervalEnd: end, symbols} = filter;
         //Filtering Securities
         securities = _.filter(securities, (security) => {
             let {'Meta Data': {'2. Symbol': symbol}, 'Weekly Adjusted Time Series': seriesData} = security;
-            let weeks = Object.keys(seriesData).sort();
+            let intervals = Object.keys(seriesData).sort();
 
-            if (symbols.length && symbols.indexOf(symbol) !== -1) {
+            if (symbols.length > 0 && symbols.indexOf(symbol) === -1) {
                 return false;
             }
 
-            if (start && weeks[weeks.length - 1] > start) {
+            if (start && intervals[intervals.length - 1] > start) {
                 return false;
             }
 
-            if (end && weeks[0] < end) {
+            if (end && intervals[0] < end) {
                 return false;
             }
 
             return true;
         });
-        //Performing filter-specific transformations on the data-set
-        _.each(securities, (security) => {
-            let {'Meta Data': {'2. Symbol': symbol}, 'Weekly Adjusted Time Series': seriesData} = security;
+        //Performing post-filter transformations on the data-set
+        let searchTotal = 0;
+        securities = _.map(securities, (security) => {
+            let {'Meta Data': {'2. Symbol': symbol, '3. Last Refreshed': lastRefreshed}, 'Weekly Adjusted Time Series': seriesData} = security;
 
-            let intervalWeeks = _.filter(Object.keys(seriesData).sort(), week =>(start && week >= start) || (end && week <= end) );
-            security['Weekly Adjusted Time Series'] = _.pick(seriesData, intervalWeeks );
+            let intervals = _.filter(Object.keys(seriesData).sort(), interval =>(start && interval >= start) || (end && interval <= end) || (!start && !end));
+            let filteredSeriesData = _.pick(seriesData, intervals);
+            //Priming the reducer
+            let firstInterval = intervals.shift();
+            let totals = {
+                symbol,
+                open: filteredSeriesData[firstInterval]['1. open'],
+                close: filteredSeriesData[intervals[intervals.length - 1]]['4. close'],
+                high: filteredSeriesData[firstInterval]['2. high'],
+                low: filteredSeriesData[firstInterval]['3. low'],
+                volume: filteredSeriesData[firstInterval]['6. volume'],
+                dataStart: firstInterval,
+                dataEnd: intervals[intervals.length - 1],
+                lastRefreshed
+            };
+            searchTotal = totals.volume;
+            delete filteredSeriesData[firstInterval];
+            //Reduce for a totals object that can be passed to the SecuritySearchItem's constructor
+            return new SecuritySearchItem(_.reduce(filteredSeriesData,
+                (memoTotals, intervalData, interval, intervalList) => {
+                    let {
+                        '2. high': high,
+                        '3. low': low,
+                        '6. volume': volume
+                    } = intervalData;
 
+                    if (high > memoTotals.high) {
+                        memoTotals.high = high;
+                    }
+
+                    if (low < memoTotals.low || memoTotals.low === null) {
+                        memoTotals.low = low;
+                    }
+
+                    searchTotal += volume;
+                    memoTotals.volume += volume;
+
+                    return memoTotals;
+                }, totals));
         });
 
-        return securities;
+        let summary = new SecuritySearchSummary({securityCount: securities.length, totalVolume: searchTotal});
+
+        return new SecuritySearchResults({filter, summary, securities});
     }
 
     getAllData() {

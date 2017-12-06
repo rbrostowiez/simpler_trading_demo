@@ -1,5 +1,5 @@
 import {EventEmitter} from 'events';
-import fetch from 'node-fetch';
+import 'whatwg-fetch';
 
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import AppConstants from '../constants/AppConstants';

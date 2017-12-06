@@ -585,7 +585,7 @@
     },
     "body-parser": {
       "version": "1.18.2",
-      "from": "body-parser@https://registry.npmjs.org/body-parser/-/body-parser-1.18.2.tgz",
+      "from": "https://registry.npmjs.org/body-parser/-/body-parser-1.18.2.tgz",
       "resolved": "https://registry.npmjs.org/body-parser/-/body-parser-1.18.2.tgz"
     },
     "brace-expansion": {
@@ -850,7 +850,7 @@
     },
     "encoding": {
       "version": "0.1.12",
-      "from": "encoding@https://registry.npmjs.org/encoding/-/encoding-0.1.12.tgz",
+      "from": "encoding@>=0.1.11 <0.2.0",
       "resolved": "https://registry.npmjs.org/encoding/-/encoding-0.1.12.tgz"
     },
     "enhanced-resolve": {
@@ -1478,7 +1478,7 @@
     },
     "node-fetch": {
       "version": "1.7.3",
-      "from": "https://registry.npmjs.org/node-fetch/-/node-fetch-1.7.3.tgz",
+      "from": "node-fetch@>=1.0.1 <2.0.0",
       "resolved": "https://registry.npmjs.org/node-fetch/-/node-fetch-1.7.3.tgz"
     },
     "node-libs-browser": {
@@ -2236,7 +2236,7 @@
     },
     "whatwg-fetch": {
       "version": "2.0.3",
-      "from": "whatwg-fetch@https://registry.npmjs.org/whatwg-fetch/-/whatwg-fetch-2.0.3.tgz",
+      "from": "https://registry.npmjs.org/whatwg-fetch/-/whatwg-fetch-2.0.3.tgz",
       "resolved": "https://registry.npmjs.org/whatwg-fetch/-/whatwg-fetch-2.0.3.tgz"
     },
     "which": {

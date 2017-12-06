@@ -1,27 +1,26 @@
 import React from 'react';
 import _ from 'underscore';
-import {Link} from 'react-router-dom';
 
 import SecuritiesStore from '../stores/SecuritiesStore';
-import AppConstants from '../constants/AppConstants';
 import SecuritySearchForm from './security-search-form';
+import SecuritySearchResultRow from "./SecuritySearchResultRow";
 
 
 export default class App extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = SecuritiesStore.getSecuritiesSummary();
+        this.state = SecuritiesStore.getSearchResults();
     }
 
     componentWillMount(){
         SecuritiesStore.on('change', (e) =>{
-            this.setState(SecuritiesStore.getSecuritiesSummary());
+            this.setState(SecuritiesStore.getSearchResults());
         })
     }
 
-
     render() {
+        let {filter, securities, summary: {totalVolume, securityCount}} = this.state;
         return (
             //TODO: A lot of this can be split into components
             <div className="container-fluid">
@@ -41,18 +40,18 @@ export default class App extends React.Component {
                             <div className="card-body">
                                 <div className="row">
                                     <div className="col-12 col-md-6">
-                                        <SecuritySearchForm />
+                                        <SecuritySearchForm props={filter} />
                                     </div>
 
                                     <div className="col-12 col-md-6">
                                         <div className="row">
                                             <div className="col">
                                                 <strong>Securities Found: </strong>
-                                                <span>{Object.keys(this.state.securityDetails).length}</span>
+                                                <span>{securityCount.toLocaleString('en-us')}</span>
                                             </div>
                                             <div className="col">
                                                 <strong>Total Volume: </strong>
-                                                <span>{this.state.totalVolume.toLocaleString('en-us')}</span>
+                                                <span>{totalVolume.toLocaleString('en-us')}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -71,21 +70,9 @@ export default class App extends React.Component {
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {_.map(this.state.securityDetails, security => (
-                                            <tr key={security.tickerId}>
-                                                <td>
-                                                    <Link to={`/security/${security.tickerId}`}>{security.tickerId}</Link>
-                                                </td>
-                                                <td>
-                                                    From: {security.startInterval} through {security.endInterval}, last refreshed: {security.lastRefreshed}
-                                                </td>
-                                                <td>{security.seriesTotals.open.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
-                                                <td>{security.seriesTotals.close.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
-                                                <td>{security.seriesTotals.high.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
-                                                <td>{security.seriesTotals.low.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
-                                                <td>{security.seriesTotals.volume.toLocaleString('en-us')}</td>
-                                            </tr>
-                                        ))}
+                                            {_.map(securities, (security, index) => (
+                                                <SecuritySearchResultRow {...security} key={`result-${index}`} />
+                                            ))}
                                         </tbody>
                                     </table>
                                 </div>

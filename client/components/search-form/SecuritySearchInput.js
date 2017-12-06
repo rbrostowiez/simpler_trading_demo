@@ -12,21 +12,29 @@ export default class SecuritySearchInput extends React.Component {
     constructor() {
         super();
 
-        this.state = SecuritiesStore.getSecuritiesSummary();
+        this.state = {
+            filter: SecuritiesStore.getFilter(),
+            autosuggest: SecuritiesStore.getAutoSuggest()
+        };
     }
 
     componentWillMount() {
         SecuritiesStore.on('change', () => {
-            this.setState(SecuritiesStore.getSecuritiesSummary());
+            this.setState({
+                filter: SecuritiesStore.getFilter(),
+                autosuggest: SecuritiesStore.getAutoSuggest()
+            });
         });
     }
 
     render() {
+        let {filter: { symbols }, autosuggest: {partial, suggestions, processingPartial}} = this.state;
+
         let tokenList = null;
         if(this.state.filter.symbols.length){
             tokenList = (
                 <span className="input-group-addon">
-                    {_.map(this.state.filter.symbols, item => (
+                    {_.map(symbols, item => (
                         <a onClick={this.removeSymbolFromSearch} key={`security-${item}`} href={`#${item}`} className="badge badge-pill badge-primary">
                             {item}
                         </a>
@@ -40,8 +48,8 @@ export default class SecuritySearchInput extends React.Component {
                 <div className="input-group">
                     {tokenList}
                     <Autosuggest
-                        suggestions={this.state.suggestions}
-                        inputProps={ {value: this.state.partial, onChange: ()=>{} } }
+                        suggestions={suggestions}
+                        inputProps={ {value: partial, onChange: ()=>{} } }
                         onSuggestionsFetchRequested={this.handleUpdates}
                         getSuggestionValue={suggestion => suggestion}
                         renderSuggestion={suggestion => suggestion}
@@ -54,6 +62,7 @@ export default class SecuritySearchInput extends React.Component {
     }
 
     handleUpdates(update){
+        console.log(update);
         if(update.reason === 'input-changed'){
             SecuritiesActions.lookupSymbol(update.value);
         }

@@ -1,10 +1,11 @@
 import express from 'express';
 import SecurityModel from '../../../shared/models/SecurityModel';
+import SecuritySearchFilter from "../../../shared/models/SecuritySearchFilter";
 
 const securityRouter = new express.Router();
 
 securityRouter.post('/data', (req, res) => {
-    res.send(SecurityModel.processRequest(req.body));
+    res.send(SecurityModel.getSecuritySearchResultsByFilter(new SecuritySearchFilter(req.body)));
 });
 
 securityRouter.get('/data', (req, res) => {
