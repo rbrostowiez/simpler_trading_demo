@@ -1,11 +1,13 @@
 import express from 'express';
-import data from './data';
-import path from 'path';
 import routers from './routers';
+import AppConstants from "../shared/constants/AppConstants";
+import session from 'express-session';
+import SecuritySearchFilter from "../shared/models/SecuritySearchFilter";
 
 const app = express();
 const serverPort = process.env.PORT || 3000;
 
+app.use(session(AppConstants.APP_SESSION_CONFIG));
 app.use('/', routers);
 
 app.listen(serverPort, () => {

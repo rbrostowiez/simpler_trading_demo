@@ -1,145 +1,138 @@
 import {EventEmitter} from 'events';
 import _ from 'underscore';
-import moment from 'moment';
 
 import AppDispatcher from '../dispatcher/AppDispatcher';
-import AppConstants from '../constants/AppConstants';
-import Data from '../../server/data';
+import SecuritiesActions from '../actions/SecuritiesActions';
+import AppConstants from '../../shared/constants/AppConstants';
+import RequestStore from './RequestStore';
+import SecuritySearchFilter from "../../shared/models/SecuritySearchFilter";
+import SecuritySearchResults from "../../shared/models/SecuritySearchResults";
+import SecuritySearchAutosuggest from "../../shared/models/SecuritySearchAutosuggest";
+import SecuritySearchSummary from "../../shared/models/SecuritySearchSummary";
 
 class SecuritiesStore extends EventEmitter {
     constructor(){
         super();
 
+        this.filter = new SecuritySearchFilter({});
+        this.filterIsStale = true;
+        this.autosuggest = new SecuritySearchAutosuggest({});
+        this.searchResults = new SecuritySearchResults({filter: this.filter, summary: new SecuritySearchSummary({}), securities: []});
+        
         this.currentSecurityId = null;
         this.securitiesDetailCache = {};
-        this.dataRangeMinDate = moment().format(AppConstants.DATE_FORMAT);
-        this.dataRangeMaxDate = AppConstants.DATE_FORMAT_EPOCH;
-        this.totalVolume = 0;
-
-        _.each(Data, this.generateSecurityDetails, this);
-
+        this.currentRequestId = null;
 
         AppDispatcher.register((payload) => {
             let {action} = payload;
 
             switch(action.actionType){
                 case AppConstants.SET_CURRENT_SECURITY:
-                    this.setCurrentSecurity(action.tickerId);
+                    this.setCurrentSecurity(action.symbol);
                     break;
-
+                case AppConstants.PERFORM_REQUEST:
+                    this.handleRequestPerformed(action);
+                    break;
+                case AppConstants.REQUEST_COMPLETED:
+                    this.handleRequestCompleted(action.requestId);
+                    break;
+                case AppConstants.UPDATE_SECURITY_SEARCH_FILTER:
+                    this.filterIsStale = this.updateFilter(action.fieldName, action.fieldValue) || this.filterIsStale;
+                    break;
+                case AppConstants.UPDATE_SECURITY_SEARCH_UPDATE_PARTIAL:
+                    this.updatePartial(action.partial);
+                    break;
                 default: return true;
             }
 
             this.emit('change');
         });
+
+        setTimeout(()=>SecuritiesActions.updateSecuritySearchFilter('',''));
     }
 
-    setCurrentSecurity(tickerId){
-        this.currentSecurityId = tickerId;
+    isFilterStale(){
+        return this.filterIsStale;
+    }
+
+    setCurrentSecurity(symbol){
+        this.currentSecurityId = symbol;
     }
 
     getCurrentSecurityDetails(){
         return this.securitiesDetailCache[this.currentSecurityId];
     }
 
-    getSecuritiesSummary(){
-        return {
-            dataRangeMaxDate: this.dataRangeMaxDate,
-            dataRangeMinDate: this.dataRangeMinDate,
-            numIntervals: this.numIntervals,
-            securityDetails: this.securitiesDetailCache,
-            totalVolume: this.totalVolume
-        };
+    getSearchResults(){
+        return this.searchResults;
     }
 
-    /**
-     * This is a function used to generate summary data and normalize the received Data object for use in Components.
-     *
-     * NOTE: Most of what is done here should really be done server-side
-     *
-     * @param securityData A single 'raw' data object for a security
-     */
-    generateSecurityDetails(securityData) {
-        let { 'Meta Data': {'2. Symbol':tickerId, '3. Last Refreshed': lastRefreshed}, 'Weekly Adjusted Time Series': seriesData} = securityData;
-        //Generating totals for the provided time series by retrieving the interval names as an array, sorting  in
-        //ascending order, then crunch values as we iterate
-        let seriesIntervals = Object.keys(seriesData).sort();
-        let numIntervals = seriesIntervals.length;
+    getFilter(){
+        return this.filter;
+    }
 
-        //TODO: This should come from server-side API
-        if(this.numIntervals < numIntervals){
-            this.numIntervals = numIntervals;
-        }
-        
-        if(this.dataRangeMaxDate < seriesIntervals[numIntervals - 1]){
-            this.dataRangeMaxDate = seriesIntervals[numIntervals - 1];
+    getAutoSuggest(){
+        return this.autosuggest;
+    }
+
+    handleRequestCompleted(requestId) {
+        if(requestId !== this.currentRequestId){
+            return;
         }
 
-        if(this.dataRangeMinDate > seriesIntervals[0]){
-            this.dataRangeMinDate = seriesIntervals[0];
+        let result = RequestStore.getRequestResults(this.currentRequestId);
+        if(result.url.indexOf(`${AppConstants.API_SECURITY}/data`) !== -1){
+            this.searchResults = new SecuritySearchResults(result.body);
+            this.filterIsStale = false;
+        }
+        else if(result.url.indexOf(`${AppConstants.API_SECURITY}/details`) !== -1){
+            this.securitiesDetailCache[result.body.interval.symbol] = result.body;
+        }
+        else if(result.url.indexOf(`${AppConstants.API_SECURITY}/lookup`) !== -1){
+            this.autosuggest.suggestions = result.body;
+            this.autosuggest.processingPartial = false;
         }
 
-        let startInterval = seriesIntervals[0];
-        let endInterval = seriesIntervals[numIntervals - 1];
-        //Reduce to get totals, and has side efect of re-mapping source object to simpler keys
-        let seriesTotals = _.reduce(seriesIntervals,
-            (totals, interval, intervalIndex, intervalList) => {
-                let {
-                    '1. open': open,
-                    '2. high': high,
-                    '3. low': low,
-                    '4. close': close,
-                    '6. volume': volume
-                } = seriesData[interval];
+        this.currentRequestId = null;
+    }
 
-                open = parseFloat(open);
-                high = parseFloat(high);
-                low = parseFloat(low);
-                close = parseFloat(close);
-                volume = parseInt(volume);
+    updateFilter(fieldName, fieldValue) {
+        console.log(this.filter);
+        if(this.filter.hasOwnProperty(fieldName)){
+            this.filter[fieldName] = fieldValue;
+        }
+        else if(fieldName === 'addToken'){
+            this.autosuggest.partial = '';
+            this.autosuggest.suggestions = [];
+            this.filter.symbols.push(fieldValue);
+            this.filter.symbols = _.uniq(this.filter.symbols);
 
-                seriesData[interval] = {
-                    open,
-                    close,
-                    high,
-                    low,
-                    volume
-                };
+        }
+        else if(fieldName === 'removeToken'){
+            this.filter.symbols = _.without(this.filter.symbols, fieldValue);
+        }
+        else{
+            return false;
+        }
 
-                if(intervalIndex == 0 ){
-                    totals.open = open;
-                }
+        return true;
+    }
+    
+    handleRequestPerformed(action) {
+        if(action.url.indexOf(AppConstants.API_SECURITY) !== -1){
+            this.currentRequestId = action.requestId;
+        }
 
-                if(intervalIndex === intervalList.length - 1){
-                    totals.close = close;
-                }
+        if(action.url.indexOf(`${AppConstants.API_SECURITY}/lookup`) !== -1){
+            this.autosuggest.processingPartial = true;
+        }
+    }
 
-                if(high > totals.high){
-                    totals.high = high;
-                }
-
-                if(low < totals.low || totals.low === null){
-                    totals.low = low;
-                }
-
-                totals.volume += volume;
-
-
-                return totals;
-            },
-            { open: null, close: null, high: null, low: null, volume: 0 }
-        );
-
-        this.totalVolume += seriesTotals.volume;
-
-        this.securitiesDetailCache[tickerId] = {
-            tickerId,
-            seriesData,
-            seriesTotals,
-            startInterval,
-            endInterval,
-            lastRefreshed
-        };
+    updatePartial(partial) {
+        this.autosuggest.partial = partial;
+        if(partial === ''){
+            this.autosuggest.suggestions = [];
+        }
     }
 }
 

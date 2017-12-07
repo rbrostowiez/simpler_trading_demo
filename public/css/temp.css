@@ -1,0 +1,33 @@
+.autosuggest__container {
+    position: relative;
+}
+
+.security-search-form .react-autosuggest__suggestions-container {
+    position: absolute;
+    z-index: 10;
+    top: 100%;
+    background: lightgrey;
+    border: 1px solid grey;
+    border-radius: 0.25em;
+    min-width: 48px;
+    display: none;
+}
+
+.security-search-form .react-autosuggest__suggestions-container--open{
+    display: block;
+}
+
+.security-search-form .react-autosuggest__suggestions-container ul{
+    list-style: none;
+    padding: 0;
+}
+
+.security-search-form .react-autosuggest__suggestions-container ul li span{
+    cursor:pointer;
+    padding: 0.25em 0.5em;
+    width: 100%;
+    display: inline-block;
+}
+.security-search-form .react-autosuggest__suggestions-container ul li span:hover{
+    background-color: #F0F0F0;
+}

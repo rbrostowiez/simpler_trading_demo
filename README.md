@@ -1,16 +1,41 @@
 # Simpler Trading Demo App
 
 ## Overview
-This is a demo application that utilizes the data provided by Simpler Trading.  The requirements are listed below, but I
-did not fully implement all requirements.  Filters were not implemented at all, due to the requirement being too large
-and not well defined for a demo application(I capped this at 8hrs and spent about 7.5hrs total). Instead I mocked out
-some of the filters -that could be used- from the format of the provided data and left them disabled w/ the current
-implicit filters set.
+This is a demo application that utilizes the data provided by Simpler Trading and generates additional data in the same
+format.  The requirements are listed below, but have also changed since this project began.
 
-The implementation within React has 3 endpoints, the root or home endpoint which is a mocked up search of the securities
-available. The second endpoint is a details page for the specific securities, which will contain totals listed on the
-home page in addition to a table of each interval of data available for the security(per the implicit filters).  The 3rd
-endpoint is a simple About page that directs the user to this file.
+Currently, the application will generate 1 year of data for a random number of fake companies ad append those to the
+provided data set.  The UI is mostly unchanged except date and volume range filters have been added and this ReadMe is
+now available under the About page.
+
+All data is retrieved via separate HTTP requests and a full React + Flux implementation is in place.  I have added a few
+libraries to accommodate the new controls.  Session storage for search filters is not implemented, however at this time,
+it would be fairly trivial as the Search is managed through a SecuritySearchFilter object that is shared between client
+and server side code.  I have even added a middleware to manage this, but implementing it through all requests is too
+much effort at this time.
+
+**NOTE:** The generated security data is created when the application initializes, so restarting will change the app and may
+result in 404's for no-longer-existent securities.
+
+## Thoughts and Ideas
+I felt a fully functional application with full round trips and proper expression of the internal architecture would be
+more important than some of the layout implementation.  I put about 18 hours of effort into this set of revisions and
+saved a branch of the original submission along with these changes before I merged into master.  I dedicated some time
+to documenting all major functions and updating this ReadMe as well.  In total, 35 files were modified and 1212 additions
+/ 348 deletions were performed as a part of these changes(excluding the package lockfile).
+
+Link to Diff: https://github.com/rbrostowiez/simpler_trading_demo/compare/original-submission...filter-implementation
+
+
+## Process for the revisions
+In order to properly implement some of the filters; I needed more data.  I wrote up a few functions to generate security
+data and added that to the Express app's initialization.  From there, I re-wired the React app to consume the bulk of
+data via HTTP requests.  I migrated all logic to the server-side and made the data objects shared between server and
+client side.  Once that was implemented, components were created to support the filtering and the round trips
+and server-side support were implemented completely.
+
+The current autosuggest and datepicker components were not the first used; I ran in to a few compatibility issues with
+ React versions before I found some that both were compatible and supported my requirements.
 
 ## Requirements
 > Leverage a JavaScript library to build a sample web application that consumes the attached json object.
@@ -19,7 +44,7 @@ endpoint is a simple About page that directs the user to this file.
 - Minimum two navigable pages
 - Caches selected filters
 
-## Installation & Use
+## Installation and Use
 After checking out the repository, you will just need to execute `npm install` then `npm start`.  The start script will
 execute 2 commands; one will build the app bundle via webpack,  the other will start the server on port 3000.  You can
 also use the environment variable `PORT=xxx npm start` to override the port.
@@ -45,38 +70,13 @@ webpack to apply ES6/JSX translations for bundling the client-side application.
 - Underscore
 - Shrinkwrap
 - Concurrently
-
-## Thoughts and Ideas
-I limited myself to 8hrs for this demo application, and put in about 7.5hrs total, including documentation.
-
-I stopped at that point because implementing functioning filters would've consumed more time than I had remaining
-(excluding what I had already allotted for documentation).  Persisting the current filters for later use is just a case
-of serialization to cookies and/or local storage coupled with deserialization steps upon the React App's initialization.
-
-React + Flux is amazing for supporting an application that utilizes dynamic filters as all filters can update the state
-of all other components on the page in real-time.  This quality of the libraries comes with a cost of longer development
-times, especially when discovery is needed for specifying the nature of the interconnectedness of the data.
-
-Beyond filters; I really wanted to implement a candlestick chart for the details page of each security.  I did look
-into this and determined the D3 library would be ideal when coupled with React + Flux, but due do some complexities of
-using D3 with React, I decided not to pursue this course of action.  That being said, it would just require a bit of
-code-shimming via a mock-DOM instance for D3 which has been done already by othe developers, and would result in
-high-speed, dynamic graphs and charts.
-
-Other items I'd like to add would be to have actual transfer of data from server to client-side.  I began work on this,
-but felt the time would be wasted, since the dataset was very limited.  I would like to add this and put a small bit of
-API in front of the data so our Stores in client-side code and directly consume an API as opposed to internalizing a
-small bit of JSON.
-
-I do have some regrets; I began a little too ambitiously and needed to rein in the implementation; too much time was
-spent on D3 charts, and along those lines I decided to cut out filter functionality.  I also wired up express to handle
-serving static assets and a JSON API when ultimately it served two static files and no API endpoints.  Granted, these
-are valuable components for a more robust implementation, but they serve me very little for the demo as-is.
-
-### TODOs
-I went through my code and added several TODO items.  Most modern editors scan for them, and you can see code-specific
-items I feel need to be addressed beyond the minimum needed for this implementation.
-
+- Bluebird(for filesystem promises)
+- uuid
+- body-parser - Middleware for express
+- react-autosuggest - Used in the Symbol lokup
+- react-datepicker - Datepicker component
+- react-markdown - Used to display this file in the browser
+- whatwg-fetch - Used for performing HTTP requests in the react application
 
 ## Provided JSON
 ~~~javascript
