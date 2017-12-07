@@ -194,9 +194,32 @@ class SecurityModel {
     }
 
     lookupSymbol(partial) {
-        let symbols = _.map(_.filter(data, item => item['Meta Data']['2. Symbol'].indexOf(partial.toUpperCase()) === 0),
+        partial = partial.toUpperCase();
+
+        let symbols = _.map(_.filter(data, item => item['Meta Data']['2. Symbol'].indexOf(partial) !== -1),
             item => item['Meta Data']['2. Symbol'].toUpperCase());
 
+        symbols.sort((a, b) => {
+
+            let aIndex = a.indexOf(partial);
+            let bIndex = b.indexOf(partial);
+
+            if(aIndex < bIndex){
+                return -1;
+            }
+            if(aIndex > bIndex){
+                return 1;
+            }
+
+            if(a < b){
+                return -1;
+            }
+            if(a > b){
+                return 1;
+            }
+
+            return 0;
+        });
 
         return symbols;
     }

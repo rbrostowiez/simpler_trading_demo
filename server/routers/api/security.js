@@ -8,10 +8,6 @@ securityRouter.post('/data', (req, res) => {
     res.send(SecurityModel.getSecuritySearchResultsByFilter(new SecuritySearchFilter(req.body)));
 });
 
-securityRouter.get('/data', (req, res) => {
-    res.send(SecurityModel.getAllData());
-});
-
 securityRouter.get('/details/:symbol', (req, res)=> {
     res.send(SecurityModel.getSecurityByTickerSymbol(req.params.symbol));
 });

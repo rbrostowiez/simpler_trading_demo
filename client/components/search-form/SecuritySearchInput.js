@@ -60,6 +60,7 @@ export default class SecuritySearchInput extends React.Component {
                         getSuggestionValue={suggestion => suggestion}
                         renderSuggestion={suggestion => suggestion}
                         alwaysRenderSuggestions={true}
+                        renderSuggestion={(suggestion) => (<span>{suggestion}</span>)}
                     />
                 </div>
 
