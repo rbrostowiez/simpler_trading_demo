@@ -4,7 +4,7 @@ import _ from 'underscore';
 import SecuritiesStore from '../stores/SecuritiesStore';
 import SecuritySearchForm from './search-form/SecuritySearchForm';
 import SecuritySearchResultRow from "./SecuritySearchResultRow";
-import AppConstants from "../constants/AppConstants";
+import AppConstants from "../../shared/constants/AppConstants";
 
 
 export default class App extends React.Component {
@@ -38,10 +38,6 @@ export default class App extends React.Component {
                                 <li>
                                     Generated symbols use the following letters:
                                     {AppConstants.GENERATED_SYMBOL_LETTERS.split('').join(', ')}.
-                                </li>
-                                <li>
-                                    Start/End Dates use the current date to generate week intervals as it would take
-                                    too much time to implement a full calendar picker integration.
                                 </li>
                             </ul>
                         </div>

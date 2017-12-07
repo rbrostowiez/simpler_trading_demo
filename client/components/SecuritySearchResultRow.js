@@ -1,6 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import AppConstants from "../constants/AppConstants";
+import AppConstants from "../../shared/constants/AppConstants";
 
 
 export default class SecuritySearchResultRow extends React.Component {

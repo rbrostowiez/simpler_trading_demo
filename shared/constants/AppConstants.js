@@ -14,5 +14,9 @@ export default {
     UPDATE_SECURITY_SEARCH_FILTER: 'UPDATE_SECURITY_SEARCH_FILTER',
     UPDATE_SECURITY_SEARCH_UPDATE_PARTIAL: 'UPDATE_SECURITY_SEARCH_UPDATE_PARTIAL',
     GENERATED_SYMBOL_LETTERS: 'BCDFGHJKLMNQRSTVXYZ',
-    README_URL: '/api/readme'
+    README_URL: '/api/readme',
+    APP_SESSION_CONFIG: {
+        secret: 'superSecret', //Not secret here as this is shared w/ client-side
+        
+    }
 };

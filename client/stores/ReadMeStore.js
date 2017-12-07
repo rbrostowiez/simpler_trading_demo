@@ -1,5 +1,5 @@
 import {EventEmitter} from 'events';
-import AppConstants from "../constants/AppConstants";
+import AppConstants from "../../shared/constants/AppConstants";
 import RequestStore from "./RequestStore";
 import AppDispatcher from '../dispatcher/AppDispatcher';
 

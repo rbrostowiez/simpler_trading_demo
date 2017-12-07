@@ -3,7 +3,7 @@ import _ from 'underscore';
 
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import SecuritiesActions from '../actions/SecuritiesActions';
-import AppConstants from '../constants/AppConstants';
+import AppConstants from '../../shared/constants/AppConstants';
 import RequestStore from './RequestStore';
 import SecuritySearchFilter from "../../shared/models/SecuritySearchFilter";
 import SecuritySearchResults from "../../shared/models/SecuritySearchResults";

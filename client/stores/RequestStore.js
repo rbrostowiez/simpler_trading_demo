@@ -2,7 +2,7 @@ import {EventEmitter} from 'events';
 import 'whatwg-fetch';
 
 import AppDispatcher from '../dispatcher/AppDispatcher';
-import AppConstants from '../constants/AppConstants';
+import AppConstants from '../../shared/constants/AppConstants';
 
 class RequestStore extends EventEmitter {
     constructor(){

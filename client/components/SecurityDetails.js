@@ -3,7 +3,7 @@ import _ from 'underscore';
 
 import SecuritiesStore from '../stores/SecuritiesStore';
 import SecuritiesActions from '../actions/SecuritiesActions';
-import AppConstants from '../constants/AppConstants';
+import AppConstants from '../../shared/constants/AppConstants';
 
 
 export default class SecurityDetails extends React.Component{

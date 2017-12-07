@@ -6,7 +6,7 @@ import SecurityInterval from "./SecurityInterval";
 import SecurityIntervalCollection from "./SecurityIntervalCollection";
 import SecuritySearchSummary from "./SecuritySearchSummary";
 import SecuritySearchResults from "./SecuritySearchResults";
-import AppConstants from "../../client/constants/AppConstants";
+import AppConstants from "../constants/AppConstants";
 
 
 const ONE_YEAR_MS = 31536000000;
@@ -27,17 +27,33 @@ function convertSecurityDataToInterval(start, end) {
 
         let intervals = _.filter(Object.keys(seriesData).sort(), interval =>(start && interval >= start) || (end && interval <= end) || (!start && !end));
         let filteredSeriesData = _.pick(seriesData, intervals);
+
+        if(intervals.length === 0){
+            return new SecurityInterval({
+                symbol,
+                open: 0.0,
+                close: 0.0,
+                high: 0.0,
+                volume: 0.0,
+                dataStart: 'n/a',
+                dataEnd: 'n/a',
+                lastRefreshed: lastRefreshed
+            });
+        }
+
+
         //Priming the reducer
         let firstInterval = intervals.shift();
+        
         let totals = {
             symbol,
             open: filteredSeriesData[firstInterval]['1. open'],
-            close: filteredSeriesData[intervals[intervals.length - 1]]['4. close'],
+            close: filteredSeriesData[ intervals.length === 0 ? firstInterval : intervals[intervals.length - 1] ]['4. close'],
             high: filteredSeriesData[firstInterval]['2. high'],
             low: filteredSeriesData[firstInterval]['3. low'],
             volume: filteredSeriesData[firstInterval]['6. volume'],
             dataStart: firstInterval,
-            dataEnd: intervals[intervals.length - 1],
+            dataEnd: intervals.length === 0 ? firstInterval : intervals[intervals.length - 1],
             lastRefreshed
         };
 
@@ -202,11 +218,11 @@ class SecurityModel {
                 return false;
             }
 
-            if (start && intervals[intervals.length - 1] > start) {
+            if (start && intervals[intervals.length - 1] < start) {
                 return false;
             }
 
-            if (end && intervals[0] < end) {
+            if (end && intervals[0] > end) {
                 return false;
             }
 

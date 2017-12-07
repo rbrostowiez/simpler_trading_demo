@@ -1,5 +1,5 @@
 import AppDispatcher from '../dispatcher/AppDispatcher';
-import AppConstants from '../constants/AppConstants';
+import AppConstants from '../../shared/constants/AppConstants';
 import UUID from 'uuid/v4';
 import SecuritiesStore from "../stores/SecuritiesStore";
 

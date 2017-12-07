@@ -1,6 +1,6 @@
 import UUID from 'uuid/v4';
 import AppDispatcher from "../dispatcher/AppDispatcher";
-import AppConstants from "../constants/AppConstants";
+import AppConstants from "../../shared/constants/AppConstants";
 
 export default class ReadMeActions {
     static getReadme(){
