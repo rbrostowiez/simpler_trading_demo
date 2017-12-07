@@ -5,7 +5,7 @@ export default class SecuritySearchResults{
      * 
      * @param {SecuritySearchFilter} filter
      * @param {SecuritySearchSummary} summary
-     * @param {SecuritySearchItem[]} securities
+     * @param {SecurityInterval[]} securities
      */
     constructor({filter = {}, summary = {}, securities = []}){
         this.filter = new SecuritySearchFilter(filter);

@@ -12,7 +12,7 @@ export default (
         <div>
             <Header />
             <Route exact path="/" component={App} />
-            <Route path="/security/:tickerId" component={SecurityDetails} />
+            <Route path="/security/:symbol" component={SecurityDetails} />
             <Route path="/about" component={About} />
         </div>
     </BrowserRouter>

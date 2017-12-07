@@ -2,9 +2,11 @@ import data from '../data';
 
 import _ from 'underscore';
 import moment from 'moment';
+import SecurityInterval from "./SecurityInterval";
+import SecurityIntervalCollection from "./SecurityIntervalCollection";
 import SecuritySearchSummary from "./SecuritySearchSummary";
 import SecuritySearchResults from "./SecuritySearchResults";
-import SecuritySearchItem from "./SecuritySearchItem";
+import AppConstants from "../../client/constants/AppConstants";
 
 
 const ONE_YEAR_MS = 31536000000;
@@ -12,37 +14,80 @@ const ONE_WEEK_MS = 604800000;
 
 const TODAY_STRING = moment().format('YYYY-MM-DD');
 
-const SYMBOL_LETTERS = 'BCDFGHJKLMNQRSTVXYZ';
+/**
+ * Generates a SecurityInterval generator for the provided start/end dates
+ *
+ * @param start
+ * @param end
+ * @returns {function()}
+ */
+function convertSecurityDataToInterval(start, end) {
+    return (security) => {
+        let {'Meta Data': {'2. Symbol': symbol, '3. Last Refreshed': lastRefreshed}, 'Weekly Adjusted Time Series': seriesData} = security;
 
-function normalize(security) {
+        let intervals = _.filter(Object.keys(seriesData).sort(), interval =>(start && interval >= start) || (end && interval <= end) || (!start && !end));
+        let filteredSeriesData = _.pick(seriesData, intervals);
+        //Priming the reducer
+        let firstInterval = intervals.shift();
+        let totals = {
+            symbol,
+            open: filteredSeriesData[firstInterval]['1. open'],
+            close: filteredSeriesData[intervals[intervals.length - 1]]['4. close'],
+            high: filteredSeriesData[firstInterval]['2. high'],
+            low: filteredSeriesData[firstInterval]['3. low'],
+            volume: filteredSeriesData[firstInterval]['6. volume'],
+            dataStart: firstInterval,
+            dataEnd: intervals[intervals.length - 1],
+            lastRefreshed
+        };
 
-    let {
-        "Meta Data": {"2. Symbol": symbol, "3. Last Refreshed": lastRefreshed, "4. Time Zone": timeZone},
-        "Weekly Adjusted Time Series": rawData
-    } = security;
+        delete filteredSeriesData[firstInterval];
+        //Reduce for a totals object that can be passed to the SecurityInterval's constructor
+        return new SecurityInterval(_.reduce(filteredSeriesData,
+            (memoTotals, intervalData, interval, intervalList) => {
+                let {
+                    '2. high': high,
+                    '3. low': low,
+                    '6. volume': volume
+                } = intervalData;
 
-    let seriesData = {};
+                if (high > memoTotals.high) {
+                    memoTotals.high = high;
+                }
 
-    for (const interval in rawData) {
-        let {
-            '1. open': open,
-            '2. high': high,
-            '3. low' : low,
-            '4. close': close,
-            '5. adjusted close': adjustedClose,
-            '6. volume': volume,
-            '7. dividendAmount': dividendAmount
-        } = rawData[interval];
+                if (low < memoTotals.low || memoTotals.low === null) {
+                    memoTotals.low = low;
+                }
 
-        seriesData[interval] = {open, high, low, close, adjustedClose, volume, dividendAmount};
-    }
+                memoTotals.volume += volume;
 
-    return {
-        symbol,
-        lastRefreshed,
-        timeZone,
-        seriesData
+                return memoTotals;
+            }, totals));
     };
+}
+
+function convertSecurityDataToIntervalCollection(security) {
+    let {'Meta Data': {'2. Symbol': symbol, '3. Last Refreshed': lastRefreshed}, 'Weekly Adjusted Time Series': seriesData} = security;
+
+
+    //Reduce for a totals object that can be passed to the SecurityInterval's constructor
+    let interval = convertSecurityDataToInterval()(security);
+
+    let intervalData = _.map(seriesData, ({'1. open': open, '4. close': close, '2. high': high, '3. low': low, '6. volume': volume}, intervalName) => {
+        return new SecurityInterval({
+            symbol,
+            open,
+            close,
+            high,
+            low,
+            volume,
+            dataStart: intervalName,
+            dataEnd: intervalName,
+            lastRefreshed
+        });
+    });
+
+    return new SecurityIntervalCollection({interval, intervalData})
 }
 
 
@@ -50,7 +95,7 @@ function generateSymbol() {
 
     let symbol = [];
     for (let i = 0; i < 4; i++) {
-        symbol.push(SYMBOL_LETTERS.charAt(Math.floor(Math.random() * SYMBOL_LETTERS.length)));
+        symbol.push(AppConstants.GENERATED_SYMBOL_LETTERS.charAt(Math.floor(Math.random() * AppConstants.GENERATED_SYMBOL_LETTERS.length)));
     }
     return symbol.join('');
 }
@@ -129,7 +174,7 @@ class SecurityModel {
     getSecurityByTickerSymbol(symbol) {
         let security = _.find(data, item => symbol.toUpperCase() === item['Meta Data']['2. Symbol']);
 
-        return normalize(security);
+        return convertSecurityDataToIntervalCollection(security);
     }
 
     lookupSymbol(partial) {
@@ -167,59 +212,13 @@ class SecurityModel {
 
             return true;
         });
-        //Performing post-filter transformations on the data-set
-        let searchTotal = 0;
-        securities = _.map(securities, (security) => {
-            let {'Meta Data': {'2. Symbol': symbol, '3. Last Refreshed': lastRefreshed}, 'Weekly Adjusted Time Series': seriesData} = security;
 
-            let intervals = _.filter(Object.keys(seriesData).sort(), interval =>(start && interval >= start) || (end && interval <= end) || (!start && !end));
-            let filteredSeriesData = _.pick(seriesData, intervals);
-            //Priming the reducer
-            let firstInterval = intervals.shift();
-            let totals = {
-                symbol,
-                open: filteredSeriesData[firstInterval]['1. open'],
-                close: filteredSeriesData[intervals[intervals.length - 1]]['4. close'],
-                high: filteredSeriesData[firstInterval]['2. high'],
-                low: filteredSeriesData[firstInterval]['3. low'],
-                volume: filteredSeriesData[firstInterval]['6. volume'],
-                dataStart: firstInterval,
-                dataEnd: intervals[intervals.length - 1],
-                lastRefreshed
-            };
-            searchTotal = totals.volume;
-            delete filteredSeriesData[firstInterval];
-            //Reduce for a totals object that can be passed to the SecuritySearchItem's constructor
-            return new SecuritySearchItem(_.reduce(filteredSeriesData,
-                (memoTotals, intervalData, interval, intervalList) => {
-                    let {
-                        '2. high': high,
-                        '3. low': low,
-                        '6. volume': volume
-                    } = intervalData;
-
-                    if (high > memoTotals.high) {
-                        memoTotals.high = high;
-                    }
-
-                    if (low < memoTotals.low || memoTotals.low === null) {
-                        memoTotals.low = low;
-                    }
-
-                    searchTotal += volume;
-                    memoTotals.volume += volume;
-
-                    return memoTotals;
-                }, totals));
-        });
+        securities = _.map(securities, convertSecurityDataToInterval(start, end));
+        let searchTotal = _.reduce(securities, (total, security) => total + security.volume, 0);
 
         let summary = new SecuritySearchSummary({securityCount: securities.length, totalVolume: searchTotal});
 
         return new SecuritySearchResults({filter, summary, securities});
-    }
-
-    getAllData() {
-        return data;
     }
 }
 

@@ -1,4 +1,4 @@
-export default class SecuritySearchItem {
+export default class SecurityInterval {
     constructor({symbol, open, close, high, low, volume, dataStart, dataEnd, lastRefreshed}){
         this.open = open;
         this.close = close;

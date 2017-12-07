@@ -12,19 +12,25 @@ export default class SecuritySearchInput extends React.Component {
     constructor() {
         super();
 
+        this.onSecurityStoreChange = () => {
+            this.setState({
+                filter: SecuritiesStore.getFilter(),
+                autosuggest: SecuritiesStore.getAutoSuggest()
+            })
+        };
+
         this.state = {
             filter: SecuritiesStore.getFilter(),
             autosuggest: SecuritiesStore.getAutoSuggest()
         };
     }
 
-    componentWillMount() {
-        SecuritiesStore.on('change', () => {
-            this.setState({
-                filter: SecuritiesStore.getFilter(),
-                autosuggest: SecuritiesStore.getAutoSuggest()
-            });
-        });
+    componentDidMount() {
+        SecuritiesStore.on('change', this.onSecurityStoreChange);
+    }
+
+    componentWillUnmount(){
+        SecuritiesStore.removeListener('change', this.onSecurityStoreChange);
     }
 
     render() {

@@ -4,19 +4,26 @@ import _ from 'underscore';
 import SecuritiesStore from '../stores/SecuritiesStore';
 import SecuritySearchForm from './security-search-form';
 import SecuritySearchResultRow from "./SecuritySearchResultRow";
+import AppConstants from "../constants/AppConstants";
 
 
 export default class App extends React.Component {
     constructor(props) {
         super(props);
 
+        this.onSecurityStoreChange = () => {
+            this.setState(SecuritiesStore.getSearchResults());
+        };
+
         this.state = SecuritiesStore.getSearchResults();
     }
 
-    componentWillMount(){
-        SecuritiesStore.on('change', (e) =>{
-            this.setState(SecuritiesStore.getSearchResults());
-        })
+    componentDidMount(){
+        SecuritiesStore.on('change', this.onSecurityStoreChange);
+    }
+
+    componentWillUnmount(){
+        SecuritiesStore.removeListener('change', this.onSecurityStoreChange);
     }
 
     render() {
@@ -28,8 +35,7 @@ export default class App extends React.Component {
                     <div className="col">
                         <p className="alert alert-warning">
                             <strong>NOTE: </strong>
-                            Most of the filter controls are disabled because there is not enough data to support their
-                            functionality.
+                            Generated symbols use the following letters: {AppConstants.GENERATED_SYMBOL_LETTERS.split('').join(', ')}.
                         </p>
                     </div>
                 </div>

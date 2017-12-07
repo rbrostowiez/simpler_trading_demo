@@ -30,7 +30,7 @@ class SecuritiesStore extends EventEmitter {
 
             switch(action.actionType){
                 case AppConstants.SET_CURRENT_SECURITY:
-                    this.setCurrentSecurity(action.tickerId);
+                    this.setCurrentSecurity(action.symbol);
                     break;
                 case AppConstants.PERFORM_REQUEST:
                     this.handleRequestPerformed(action);
@@ -56,9 +56,6 @@ class SecuritiesStore extends EventEmitter {
     }
 
     getCurrentSecurityDetails(){
-        if(!this.securitiesDetailCache.hasOwnProperty(this.currentSecurityId)){
-            SecuritiesActions.loadSecurity();
-        }
         return this.securitiesDetailCache[this.currentSecurityId];
     }
 
@@ -89,7 +86,7 @@ class SecuritiesStore extends EventEmitter {
             this.searchResults = new SecuritySearchResults(result.body);
         }
         else if(result.url.indexOf(`${AppConstants.API_SECURITY}/details`) !== -1){
-            this.securitiesDetailCache[result.body.symbol] = result.body;
+            this.securitiesDetailCache[result.body.interval.symbol] = result.body;
         }
         else if(result.url.indexOf(`${AppConstants.API_SECURITY}/lookup`) !== -1){
             this.autosuggest.suggestions = result.body;
@@ -120,7 +117,6 @@ class SecuritiesStore extends EventEmitter {
         if(action.url.indexOf(AppConstants.API_SECURITY) !== -1){
             this.currentRequestId = action.requestId;
         }
-
 
         if(action.url.indexOf(`${AppConstants.API_SECURITY}/lookup`) !== -1){
             this.autosuggest.processingPartial = true;

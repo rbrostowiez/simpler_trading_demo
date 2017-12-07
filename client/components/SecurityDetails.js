@@ -11,20 +11,28 @@ export default class SecurityDetails extends React.Component{
         super(props);
 
         this.state = false;
+
+        this.onSecuritiesStoreChange = () => {
+            this.setState(SecuritiesStore.getCurrentSecurityDetails());
+        };
+
+        SecuritiesActions.setCurrentSecurity(this.props.match.params.symbol);
     }
 
     componentDidMount(){
-        SecuritiesStore.on('change', e => this.setState(SecuritiesStore.getCurrentSecurityDetails()), this);
-        SecuritiesActions.setCurrentSecurity(this.props.match.params.tickerId);
+        SecuritiesStore.on('change', this.onSecuritiesStoreChange);
     }
 
+    componentWillUnmount(){
+        SecuritiesStore.removeListener('change', this.onSecuritiesStoreChange);
+    }
 
     render(){
         if(!this.state){
             return (<div className="alert alert-danger">Loading!</div>)
         }
 
-        let {tickerId, seriesTotals, startInterval, endInterval, lastRefreshed, seriesData} = this.state;
+        let {interval: { symbol, lastRefreshed, open, close, high, low, volume, dataStart, dataEnd }, intervalData} = this.state;
 
         return (
             //TODO: More components and less giant blocks of HTML!
@@ -33,7 +41,7 @@ export default class SecurityDetails extends React.Component{
                     <div className="col">
                         <div className="card bg-light mb-3">
                             <div className="card-header">
-                                {tickerId}
+                                {symbol}
                             </div>
                             <div className="card-body">
                                 <div className="row">
@@ -43,11 +51,11 @@ export default class SecurityDetails extends React.Component{
                                     </div>
                                     <div className="col">
                                         <strong className="d-block">Data Start: </strong>
-                                        <span >{startInterval}</span>
+                                        <span >{dataStart}</span>
                                     </div>
                                     <div className="col">
                                         <strong className="d-block">Data End: </strong>
-                                        <span>{endInterval}</span>
+                                        <span>{dataEnd}</span>
                                     </div>
                                     <div className="col">
                                         <table className="table">
@@ -62,11 +70,11 @@ export default class SecurityDetails extends React.Component{
                                             </thead>
                                             <tbody>
                                             <tr>
-                                                <td>{seriesTotals.open.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
-                                                <td>{seriesTotals.close.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
-                                                <td>{seriesTotals.high.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
-                                                <td>{seriesTotals.low.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
-                                                <td>{seriesTotals.volume.toLocaleString('en-us')}</td>
+                                                <td>{open.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
+                                                <td>{close.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
+                                                <td>{high.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
+                                                <td>{low.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
+                                                <td>{volume.toLocaleString('en-us')}</td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -85,14 +93,14 @@ export default class SecurityDetails extends React.Component{
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {_.map(seriesData, (interval, intervalName) => (
-                                            <tr key={intervalName}>
-                                                <td>{intervalName}</td>
-                                                <td>{interval.open.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
-                                                <td>{interval.close.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
-                                                <td>{interval.high.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
-                                                <td>{interval.low.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
-                                                <td>{interval.volume.toLocaleString('en-us')}</td>
+                                        {_.map(intervalData, ({dataStart, open, close, high, low, volume}) => (
+                                            <tr key={dataStart}>
+                                                <td>{dataStart}</td>
+                                                <td>{open.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
+                                                <td>{close.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
+                                                <td>{high.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
+                                                <td>{low.toLocaleString('en-us', AppConstants.CURRENCY_OPTIONS)}</td>
+                                                <td>{volume.toLocaleString('en-us')}</td>
                                             </tr>
                                         ), this)}
                                         </tbody>

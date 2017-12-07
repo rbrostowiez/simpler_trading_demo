@@ -4,10 +4,16 @@ import UUID from 'uuid/v4';
 import SecuritiesStore from "../stores/SecuritiesStore";
 
 export default class SecuritiesActions {
-    static setCurrentSecurity(tickerId){
+    static setCurrentSecurity(symbol){
         AppDispatcher.handleAction({
             actionType: AppConstants.SET_CURRENT_SECURITY,
-            tickerId: tickerId
+            symbol: symbol
+        });
+
+        AppDispatcher.handleAction({
+            actionType: AppConstants.PERFORM_REQUEST,
+            url: `${AppConstants.API_SECURITY}/details/${symbol}`,
+            requestId: UUID()
         });
     }
 
@@ -15,14 +21,6 @@ export default class SecuritiesActions {
         AppDispatcher.handleAction({
             actionType: AppConstants.PERFORM_REQUEST,
             url: `${AppConstants.API_SECURITY}/data`,
-            requestId: UUID()
-        });
-    }
-
-    static loadSecurity(symbol){
-        AppDispatcher.handleAction({
-            actionType: AppConstants.PERFORM_REQUEST,
-            url: `${AppConstants.API_SECURITY}/details/${symbol}`,
             requestId: UUID()
         });
     }
