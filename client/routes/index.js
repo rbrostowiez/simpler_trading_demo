@@ -4,7 +4,7 @@ import { BrowserRouter, Route } from 'react-router-dom';
 import App from '../components/App';
 import Header from '../components/Header';
 import SecurityDetails from '../components/SecurityDetails';
-import About from '../components/about';
+import About from '../components/About';
 
 //TODO: Fix this so Header can have path-information as well
 export default (

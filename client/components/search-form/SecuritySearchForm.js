@@ -1,13 +1,25 @@
 import React from 'react';
 
-import SecurityStore from '../stores/SecuritiesStore';
-import SecuritySearchInput from './search-form/SecuritySearchInput'
+import SecurityStore from '../../stores/SecuritiesStore';
+import SecuritySearchInput from './SecuritySearchInput'
 
 export default class SecuritySearchForm extends React.Component {
     constructor(){
         super();
 
+        this.onSecuritiesStoreChange = () =>{
+            this.setState(SecurityStore.getFilter());
+        };
+
         this.state = SecurityStore.getFilter();
+    }
+
+    componentDidMount(){
+        SecurityStore.on('change', this.onSecuritiesStoreChange);
+    }
+
+    componentWillUnmount(){
+        SecurityStore.removeListener('change', this.onSecuritiesStoreChange);
     }
 
     render(){

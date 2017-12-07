@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'underscore';
 
 import SecuritiesStore from '../stores/SecuritiesStore';
-import SecuritySearchForm from './security-search-form';
+import SecuritySearchForm from './search-form/SecuritySearchForm';
 import SecuritySearchResultRow from "./SecuritySearchResultRow";
 import AppConstants from "../constants/AppConstants";
 
@@ -29,14 +29,22 @@ export default class App extends React.Component {
     render() {
         let {filter, securities, summary: {totalVolume, securityCount}} = this.state;
         return (
-            //TODO: A lot of this can be split into components
             <div className="container-fluid">
                 <div className="row">
                     <div className="col">
-                        <p className="alert alert-warning">
+                        <div className="alert alert-warning">
                             <strong>NOTE: </strong>
-                            Generated symbols use the following letters: {AppConstants.GENERATED_SYMBOL_LETTERS.split('').join(', ')}.
-                        </p>
+                            <ul>
+                                <li>
+                                    Generated symbols use the following letters:
+                                    {AppConstants.GENERATED_SYMBOL_LETTERS.split('').join(', ')}.
+                                </li>
+                                <li>
+                                    Start/End Dates use the current date to generate week intervals as it would take
+                                    too much time to implement a full calendar picker integration.
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div className="row">
@@ -86,8 +94,6 @@ export default class App extends React.Component {
                         </div>
                     </div>
                 </div>
-
-
             </div>
         );
     }

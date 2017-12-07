@@ -9,10 +9,10 @@ const router = new express.Router();
 router.use('/api', api);
 
 //Serve any static assets we need(none atm)
-router.use('/', express.static(path.join(__dirname, '/../../public')));
+router.use('/', express.static(path.join(__dirname, '/../../public'), {fallthrough: true}));
 
 //Middleware that will serve index.html for 404's
-router.use((req, res) => { res.sendFile(path.join(__dirname, '/../public/index.html')); });
+router.use((req, res, next) => { res.sendFile(path.join(__dirname, '/../../public/index.html')); });
 
 
 export default router;

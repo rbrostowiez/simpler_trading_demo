@@ -1,6 +1,5 @@
 import {EventEmitter} from 'events';
 import _ from 'underscore';
-import moment from 'moment';
 
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import SecuritiesActions from '../actions/SecuritiesActions';
@@ -111,8 +110,7 @@ class SecuritiesStore extends EventEmitter {
             this.filter.symbols = _.without(this.filter.symbols, fieldValue);
         }
     }
-
-
+    
     handleRequestPerformed(action) {
         if(action.url.indexOf(AppConstants.API_SECURITY) !== -1){
             this.currentRequestId = action.requestId;
