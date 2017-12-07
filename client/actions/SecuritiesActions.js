@@ -47,20 +47,22 @@ export default class SecuritiesActions {
             fieldValue: fieldValue
         });
 
-        let postPayload = JSON.stringify(SecuritiesStore.getFilter());
+        if(SecuritiesStore.isFilterStale()){
+            let postPayload = JSON.stringify(SecuritiesStore.getFilter());
 
-        AppDispatcher.handleAction({
-            actionType: AppConstants.PERFORM_REQUEST,
-            url: `${AppConstants.API_SECURITY}/data`,
-            requestOptions: {
-                method: 'post',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': postPayload.length
+            AppDispatcher.handleAction({
+                actionType: AppConstants.PERFORM_REQUEST,
+                url: `${AppConstants.API_SECURITY}/data`,
+                requestOptions: {
+                    method: 'post',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Content-Length': postPayload.length
+                    },
+                    body: new Buffer(postPayload)
                 },
-                body: new Buffer(postPayload)
-            },
-            requestId: UUID()
-        });
+                requestId: UUID()
+            });
+        }
     }
 }

@@ -14,11 +14,10 @@ class SecuritiesStore extends EventEmitter {
     constructor(){
         super();
 
-        this.initialized = false;
-
         this.filter = new SecuritySearchFilter({});
+        this.filterIsStale = true;
         this.autosuggest = new SecuritySearchAutosuggest({});
-        this.searchResults = new SecuritySearchResults(this.filter, new SecuritySearchSummary({}), []);
+        this.searchResults = new SecuritySearchResults({filter: this.filter, summary: new SecuritySearchSummary({}), securities: []});
         
         this.currentSecurityId = null;
         this.securitiesDetailCache = {};
@@ -38,7 +37,7 @@ class SecuritiesStore extends EventEmitter {
                     this.handleRequestCompleted(action.requestId);
                     break;
                 case AppConstants.UPDATE_SECURITY_SEARCH_FILTER:
-                    this.updateFilter(action.fieldName, action.fieldValue);
+                    this.filterIsStale = this.updateFilter(action.fieldName, action.fieldValue) || this.filterIsStale;
                     break;
                 case AppConstants.UPDATE_SECURITY_SEARCH_UPDATE_PARTIAL:
                     this.updatePartial(action.partial);
@@ -48,6 +47,12 @@ class SecuritiesStore extends EventEmitter {
 
             this.emit('change');
         });
+
+        setTimeout(()=>SecuritiesActions.updateSecuritySearchFilter('',''));
+    }
+
+    isFilterStale(){
+        return this.filterIsStale;
     }
 
     setCurrentSecurity(symbol){
@@ -59,10 +64,6 @@ class SecuritiesStore extends EventEmitter {
     }
 
     getSearchResults(){
-        if(!this.initialized){
-            SecuritiesActions.updateSecuritySearchFilter('','');
-        }
-
         return this.searchResults;
     }
 
@@ -81,8 +82,8 @@ class SecuritiesStore extends EventEmitter {
 
         let result = RequestStore.getRequestResults(this.currentRequestId);
         if(result.url.indexOf(`${AppConstants.API_SECURITY}/data`) !== -1){
-            this.initialized = true;
             this.searchResults = new SecuritySearchResults(result.body);
+            this.filterIsStale = false;
         }
         else if(result.url.indexOf(`${AppConstants.API_SECURITY}/details`) !== -1){
             this.securitiesDetailCache[result.body.interval.symbol] = result.body;
@@ -96,6 +97,7 @@ class SecuritiesStore extends EventEmitter {
     }
 
     updateFilter(fieldName, fieldValue) {
+        console.log(this.filter);
         if(this.filter.hasOwnProperty(fieldName)){
             this.filter[fieldName] = fieldValue;
         }
@@ -109,6 +111,11 @@ class SecuritiesStore extends EventEmitter {
         else if(fieldName === 'removeToken'){
             this.filter.symbols = _.without(this.filter.symbols, fieldValue);
         }
+        else{
+            return false;
+        }
+
+        return true;
     }
     
     handleRequestPerformed(action) {

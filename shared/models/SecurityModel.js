@@ -44,7 +44,7 @@ function convertSecurityDataToInterval(start, end) {
 
         //Priming the reducer
         let firstInterval = intervals.shift();
-        
+
         let totals = {
             symbol,
             open: filteredSeriesData[firstInterval]['1. open'],
@@ -157,7 +157,7 @@ function generateYearOfData() {
         const low = Math.max(didWell ? lastPrice * (1 - Math.random() * volatility) : lastPrice * (1 - Math.random() * volatility * 10), 1);
         const adjustedClose = Math.max(close + (Math.random() * volatility * didWell ? 1 : -1), 1);
         const close = didWell ? lastPrice + Math.random() * Math.abs(high - lastPrice) : lastPrice - Math.random() * Math.abs(lastPrice - low);
-        const volume = volumeFactor * Math.abs(high - low) / lastPrice;
+        const volume = Math.floor(volumeFactor * Math.abs(high - low) / lastPrice);
         const dividend = i === dividendWeek ? startPrice * score / 1000 : 0.0;
 
         intervalData[interval] = {
@@ -208,7 +208,7 @@ class SecurityModel {
      */
     getSecuritySearchResultsByFilter(filter) {
         let securities = data;
-        let {intervalStart: start, intervalEnd: end, symbols} = filter;
+        let {intervalStart: start, intervalEnd: end, symbols, volumeMin, volumeMax} = filter;
         //Filtering Securities
         securities = _.filter(securities, (security) => {
             let {'Meta Data': {'2. Symbol': symbol}, 'Weekly Adjusted Time Series': seriesData} = security;
@@ -224,6 +224,19 @@ class SecurityModel {
 
             if (end && intervals[0] > end) {
                 return false;
+            }
+
+            if(volumeMin || volumeMax){
+
+                let securityVolume = _.reduce(seriesData, (total, intervalVolume) => total + intervalVolume['6. volume'], 0);
+
+
+                if(volumeMin && securityVolume < volumeMin){
+                    return false;
+                }
+                if(volumeMax && securityVolume > volumeMax){
+                    return false;
+                }
             }
 
             return true;

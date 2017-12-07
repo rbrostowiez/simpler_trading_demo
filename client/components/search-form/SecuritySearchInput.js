@@ -55,7 +55,7 @@ export default class SecuritySearchInput extends React.Component {
                     {tokenList}
                     <Autosuggest
                         suggestions={suggestions}
-                        inputProps={ {value: partial, onChange: ()=>{} } }
+                        inputProps={ {size: 36, value: partial, placeholder: 'Search for Securities by Symbol', onChange: ()=>{} } }
                         onSuggestionsFetchRequested={this.handleUpdates}
                         getSuggestionValue={suggestion => suggestion}
                         renderSuggestion={suggestion => suggestion}
