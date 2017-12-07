@@ -1,3 +1,5 @@
+import UUID from 'uuid/v4';
+
 //TODO: Organize constants better
 export default {
     SET_CURRENT_SECURITY: 'SET_CURRENT_SECURITY',
@@ -17,6 +19,5 @@ export default {
     README_URL: '/api/readme',
     APP_SESSION_CONFIG: {
         secret: 'superSecret', //Not secret here as this is shared w/ client-side
-        
     }
 };

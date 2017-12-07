@@ -2,6 +2,7 @@ import express from 'express';
 import routers from './routers';
 import AppConstants from "../shared/constants/AppConstants";
 import session from 'express-session';
+import SecuritySearchFilter from "../shared/models/SecuritySearchFilter";
 
 const app = express();
 const serverPort = process.env.PORT || 3000;

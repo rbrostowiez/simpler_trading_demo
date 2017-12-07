@@ -17,8 +17,8 @@ const TODAY_STRING = moment().format('YYYY-MM-DD');
 /**
  * Generates a SecurityInterval generator for the provided start/end dates
  *
- * @param start
- * @param end
+ * @param {string} start Date string in format: YYYY-MM-DD
+ * @param {string} end Date string in format: YYYY-MM-DD
  * @returns {function()}
  */
 function convertSecurityDataToInterval(start, end) {
@@ -82,9 +82,15 @@ function convertSecurityDataToInterval(start, end) {
     };
 }
 
+/**
+ * Converts the provided security object into a SecurityIntervalCollection object, which is itself a SecurityInterval
+ * representing a collection of intervals
+ *
+ * @param {{}} security 'Raw' security object
+ * @returns {SecurityIntervalCollection}
+ */
 function convertSecurityDataToIntervalCollection(security) {
     let {'Meta Data': {'2. Symbol': symbol, '3. Last Refreshed': lastRefreshed}, 'Weekly Adjusted Time Series': seriesData} = security;
-
 
     //Reduce for a totals object that can be passed to the SecurityInterval's constructor
     let interval = convertSecurityDataToInterval()(security);
@@ -106,7 +112,11 @@ function convertSecurityDataToIntervalCollection(security) {
     return new SecurityIntervalCollection({interval, intervalData})
 }
 
-
+/**
+ * Generates a 4-letter symbol from the set of characters defined in AppConstants.GENERATED_SYMBOL_LETTERS
+ *
+ * @returns {string}
+ */
 function generateSymbol() {
 
     let symbol = [];
@@ -116,6 +126,10 @@ function generateSymbol() {
     return symbol.join('');
 }
 
+/**
+ * This will generate random data for a security in the 'Raw' format as provided; it also pushes to the data variable directly
+ *
+ */
 function generateRandomCompanyData() {
     let symbol = generateSymbol();
     //Ensuring no duplicate symbols
@@ -136,7 +150,11 @@ function generateRandomCompanyData() {
     });
 }
 
-
+/**
+ * Generates 52 weekly security intervals based upon mostly random factors and output as the 'Raw' format provided
+ *
+ * @returns {{}}
+ */
 function generateYearOfData() {
     const volatility = Math.random() * 0.2 + 0.05; //Range: [5 - 24.999%]
     const volumeFactor = Math.min(Math.floor(Math.random() * 100000000), 500000);//Range: [500,000:9,999,999] with high chances on 500,000
@@ -187,12 +205,23 @@ class SecurityModel {
         }
     }
 
+    /**
+     * Returns a SecurityIntervalCollection for the provided symbol ticker
+     *
+     * @param symbol
+     * @returns {SecurityIntervalCollection}
+     */
     getSecurityByTickerSymbol(symbol) {
         let security = _.find(data, item => symbol.toUpperCase() === item['Meta Data']['2. Symbol']);
 
         return convertSecurityDataToIntervalCollection(security);
     }
 
+    /**
+     * Returns an array of symbols that match the provided partial symbol
+     *
+     * @param {string[]} partial
+     */
     lookupSymbol(partial) {
         partial = partial.toUpperCase();
 
@@ -225,6 +254,7 @@ class SecurityModel {
     }
 
     /**
+     * Performs a search using the provided filter object and returns a SecuritySearchResults object
      *
      * @param {SecuritySearchFilter} filter
      * @return {SecuritySearchResults}

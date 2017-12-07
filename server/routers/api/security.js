@@ -5,7 +5,7 @@ import SecuritySearchFilter from "../../../shared/models/SecuritySearchFilter";
 const securityRouter = new express.Router();
 
 securityRouter.post('/data', (req, res) => {
-    res.send(SecurityModel.getSecuritySearchResultsByFilter(new SecuritySearchFilter(req.body)));
+    res.send(SecurityModel.getSecuritySearchResultsByFilter(req.session.filter));
 });
 
 securityRouter.get('/details/:symbol', (req, res)=> {

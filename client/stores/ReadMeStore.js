@@ -26,7 +26,7 @@ class ReadMeStore extends EventEmitter {
             this.emit('change');
         });
     }
-
+    
     handleRequestCompleted(action){
         if(action.requestId = this.currentRequestId){
             let results = RequestStore.getRequestResults(this.currentRequestId);

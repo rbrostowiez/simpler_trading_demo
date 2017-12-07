@@ -27,8 +27,14 @@ export default class SecuritySearchForm extends React.Component {
         SecurityStore.removeListener('change', this.onSecuritiesStoreChange);
     }
 
-
-
+    /**
+     * Returns a props object for a DatePicker instance with a bound handler for onDateChange specific to the provided
+     * fieldName.
+     *
+     * @param {string} fieldName
+     * @param {moment} selectedDate
+     * @returns {{minTime: *, maxTime: *, onChange: *, placeHolderText: string, locale: string, isClearable: boolean, monthsShown: number, id: *}}
+     */
     getCalendarProps(fieldName, selectedDate) {
 
         let props = {
@@ -50,6 +56,12 @@ export default class SecuritySearchForm extends React.Component {
         return props;
     }
 
+    /**
+     * Event handler for text fields' onChange; it will validate the entered value to ensure it's numeric
+     *
+     * @param {Event} e
+     * @returns {boolean}
+     */
     onChange(e){
         e.preventDefault();
         let value = e.target.value;
@@ -68,9 +80,15 @@ export default class SecuritySearchForm extends React.Component {
         return true;
     }
 
+    /**
+     * Factory for onDateChange handlers for any calendars; allows you to bind the fieldName to the callback handler,
+     * since the DatePicker in use doesn't broadcast any info but the selected date
+     *
+     * @param {string} fieldName Field name to be used for updating the filter
+     * @returns {function()} onChange handler function
+     */
     onDateChangeGenerator(fieldName) {
         return (date)=>{
-
             SecuritiesActions.updateSecuritySearchFilter(fieldName, date ? date.format('YYYY-MM-DD') : date);
         }
     }
